@@ -52,6 +52,7 @@ class GridViewState extends State<GridViewPage> {
 //GridView的两种常用创建方式
 // 1.固定列数
 Widget _buildGrid() => GridView.count(
+      scrollDirection: Axis.vertical,
       children: _buildGridTileList(30),
       crossAxisCount: 3,
       padding: const EdgeInsets.all(4),
@@ -81,6 +82,7 @@ List<Container> _buildGridTileList(int count) => List.generate(
         ));
 
 Widget _buildList() => ListView(
+      scrollDirection: Axis.vertical,
       children: [
         _tile('CineArts at the Empire', '85 W Portal Ave', Icons.theaters),
         _tile('The Castro Theater', '429 Castro St', Icons.theaters),
@@ -89,7 +91,9 @@ Widget _buildList() => ListView(
         _tile('United Artists Stonestown Twin', '501 Buckingham Way',
             Icons.theaters),
         _tile('AMC Metreon 16', '135 4th St #3000', Icons.theaters),
-        Divider(),
+        //分割线
+        Divider(color: Colors.red,),
+
         _tile('K\'s Kitchen', '757 Monterey Blvd', Icons.restaurant),
         _tile('Emmy\'s Restaurant', '1923 Ocean Ave', Icons.restaurant),
         _tile('Chaiya Thai Restaurant', '272 Claremont Blvd', Icons.restaurant),
