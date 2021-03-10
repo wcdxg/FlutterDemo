@@ -2,9 +2,29 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
-void main() => runApp(HelloWorld());
+void main() => runApp(FavoriteWidget());
 
-class HelloWorld extends StatelessWidget {
+class FavoriteWidget extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() => _FavoriteWidgetState();
+}
+
+class _FavoriteWidgetState extends State<FavoriteWidget> {
+  bool _isFavorite = true;
+  int _favoriteCount = 41;
+
+  void _toggleFavorite() {
+    setState(() {
+      if (_isFavorite) {
+        _favoriteCount--;
+        _isFavorite = false;
+      } else {
+        _favoriteCount++;
+        _isFavorite = true;
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     //图像区域
@@ -40,11 +60,18 @@ class HelloWorld extends StatelessWidget {
               ],
             ),
           ),
-          Icon(
-            Icons.star,
-            color: Colors.red,
-          ),
-          Text('43')
+          IconButton(
+              icon: _isFavorite
+                  ? Icon(
+                Icons.star,
+                color: Colors.red,
+              )
+                  : Icon(
+                Icons.star_border,
+                color: Colors.red,
+              ),
+              onPressed: _toggleFavorite),
+          Text('$_favoriteCount')
         ],
       ),
     );
