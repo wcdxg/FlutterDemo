@@ -6,7 +6,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
 
 void main() => runApp(MyApp());
 //------------------------- MyApp ----------------------------------
@@ -25,7 +24,6 @@ class MyApp extends StatelessWidget {
         ),
       ),
     );
-
   }
 }
 
