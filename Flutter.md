@@ -375,6 +375,96 @@ ListView更新数据,如果是直接在`setState()`里面更新一组widget,因�
 
 * 使用 Listeners 和 StatusListeners 监视动画状态变化。
 
+* `AnimatedWidget`可以从动画代码中区分出核心widget代码，不需要保持State对象来hold动画,适用于可重复使用的动画定义Widget
+
+  ```dart
+  ## 修改前：
+  controller =
+          AnimationController(vsync: this, duration: const Duration(seconds: 2));
+      animation = Tween<double>(begin: 0, end: 300).animate(controller)
+        ..addListener(() {
+          setState(() {
+            print("Animation Value =  $animation.value");
+          });
+        });
+      controller.forward();
+  ```
+
+  ```dart
+  ## 修改后，移除了addListener和setState代码
+  animation = Tween<double>(begin: 0, end: 300).animate(controller);
+  controller.forward();
+      
+  class AnimatedLogo extends AnimatedWidget {
+    AnimatedLogo({Key key, Animation<double> animation})
+        : super(key: key, listenable: animation);
+  
+    @override
+    Widget build(BuildContext context) {
+      final animation = listenable as Animation<double>;
+      return Center(
+        child: Container(
+          child: FlutterLogo(),
+          margin: const EdgeInsets.symmetric(vertical: 10),
+          height: animation.value,
+          width: animation.value,
+        ),
+      );
+    }
+  }
+  
+    @override
+    Widget build(BuildContext context) {
+      return AnimatedLogo(animation: animation,);
+    }
+  ```
+
+* `AnimatedBuilder` 相对于AnimatedBuilder来说，不会渲染widget，也不会控制动画对象，相当于一个对接者，引入需要渲染的widget以及动画对象，自动监听动画对象，并通知渲染widget。
+
+  ```dart
+  ## 动画对象
+  controller =
+          AnimationController(duration: Duration(seconds: 2), vsync: this);
+  animation = Tween<double>(begin: 0, end: 300).animate(controller);
+  controller.forward();
+  
+  ## 渲染的Widget
+  class LogoWidget extends StatelessWidget {
+    @override
+    Widget build(BuildContext context) {
+      print('GrowTransition创建');
+      return Container(
+        margin: const EdgeInsets.symmetric(vertical: 10),
+        child: FlutterLogo(),
+      );
+    }
+  }
+  
+  ## AnimatedBuilder
+  class GrowTransition extends StatelessWidget {
+    GrowTransition({this.child, this.animation});
+    final Widget child;
+    final Animation<double> animation;
+    @override
+    Widget build(BuildContext context) {
+      print('GrowTransition创建');
+      return Center(
+        child: AnimatedBuilder(
+          animation: animation,
+          builder: (context, child) => Container(
+            height: animation.value,
+            width: animation.value,
+            child: child,
+          ),
+          child: child,
+        ),
+      );
+    }
+  }
+  ```
+
+  
+
 ## Flutter添加到现有Android项目步骤
 
 * AS 新建Flutter Module ( 需要配合Flutter插件 )
