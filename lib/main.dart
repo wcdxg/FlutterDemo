@@ -11,7 +11,6 @@ class SampleApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Sample App',
-      theme: ThemeData(primaryColor: Colors.blue),
       home: SampleAppPage(),
     );
   }
