@@ -346,6 +346,8 @@ ListView更新数据,如果是直接在`setState()`里面更新一组widget,因�
 
 ## 11.动画
 
+### 11.1 Animation介绍
+
 * `Animation` Flutter 动画库中的核心抽象类，插入用于指导动画的值, `Animation` 对象知道动画目前的状态（例如，是否开始，暂停，前进或倒退），但是对屏幕上显示的内容一无所知
 
 * [`AnimationController`](https://api.flutter-io.cn/flutter/animation/AnimationController-class.html) 管理 `Animation`。
@@ -374,6 +376,8 @@ ListView更新数据,如果是直接在`setState()`里面更新一组widget,因�
   ```
 
 * 使用 Listeners 和 StatusListeners 监视动画状态变化。
+
+### 11.2 AnimatedWidget
 
 * `AnimatedWidget`可以从动画代码中区分出核心widget代码，不需要保持State对象来hold动画,适用于可重复使用的动画定义Widget
 
@@ -418,8 +422,9 @@ ListView更新数据,如果是直接在`setState()`里面更新一组widget,因�
       return AnimatedLogo(animation: animation,);
     }
   ```
+### 11.3 AnimatedBuilder
 
-* `AnimatedBuilder` 相对于AnimatedBuilder来说，不会渲染widget，也不会控制动画对象，相当于一个对接者，引入需要渲染的widget以及动画对象，自动监听动画对象，并通知渲染widget。
+* `AnimatedBuilder` 相对于`AnimatedWidget`来说，不会渲染widget，也不会控制动画对象，相当于一个对接者，引入需要渲染的widget以及动画对象，自动监听动画对象，并通知渲染widget。
 
   ```dart
   ## 动画对象
@@ -463,7 +468,64 @@ ListView更新数据,如果是直接在`setState()`里面更新一组widget,因�
   }
   ```
 
+### 11.4 同步动画
+
+* 在同一个动画控制器中使用多个动画 `CurvedAnimation`
+
+  ```dart
+   controller =
+          AnimationController(duration: const Duration(seconds: 2), vsync: this);
+      animation = CurvedAnimation(parent: controller, curve: Curves.easeIn)
+  ```
+
+  ```dart
+  class AnimatedLogo extends AnimatedWidget {
+    // Make the Tweens static because they don't change.
+    static final _opacityTween = Tween<double>(begin: 0.1, end: 1);
+    static final _sizeTween = Tween<double>(begin: 0, end: 300);
   
+    AnimatedLogo({Key key, Animation<double> animation})
+        : super(key: key, listenable: animation);
+  
+    Widget build(BuildContext context) {
+      final animation = listenable as Animation<double>;
+      return Center(
+        child: Opacity(
+          opacity: _opacityTween.evaluate(animation),
+          child: Container(
+            margin: EdgeInsets.symmetric(vertical: 10),
+            height: _sizeTween.evaluate(animation),
+            width: _sizeTween.evaluate(animation),
+            child: FlutterLogo(),
+          ),
+        ),
+      );
+    }
+  }
+  ```
+
+  动画重复播放可以使用`..repeat`,使用repeat时不需要使用`controller.forward()`来播放动画,会自动播放
+
+  ```dart
+    controller =
+          AnimationController(duration: Duration(seconds: 2), vsync: this)
+            ..repeat(reverse: true);
+  ```
+
+### 11.5 Hero动画(共享元素动画)
+
+​	hero动画实现需要两个Hero Widget : 一个用来在原页面中描述 widget，另一个在目标页面中描述 widget,两个hero widgets要创建相同的标签.Hero 动画代码有如下结构：
+
+1. 定义一个起始 Hero widget，被称为 **source hero**。该 hero 指定图形表示（通常是图像），以及识别标签`tag`，并且在由原页面定义的当前显示的 widget 树中。
+2. 定义一个截至 Hero widget，被称为 **destination hero**。该 hero 也指定图形表示，并与 source hero 使用同样的标签`tag`, **这是基本，两个 hero widgets 要创建相同的标签**
+3. 创建一个含有 destination hero 的页面。目标页面定义了动画结束时应有的 widget 树。
+4. 通过推送目标页面到 Navigator 堆栈来触发动画。 Navigator 推送并弹出操作触发原页面和目标页面中含有配对标签 heroes 的 hero 动画。
+
+
+
+
+
+
 
 ## Flutter添加到现有Android项目步骤
 

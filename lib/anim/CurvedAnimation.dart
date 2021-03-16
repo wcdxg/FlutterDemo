@@ -1,10 +1,13 @@
-import 'package:flutter/material.dart';
 import 'package:flutter/animation.dart';
+import 'package:flutter/material.dart';
 
 //动画
 void main() => runApp(LogoApp());
 
 class AnimatedLogo extends AnimatedWidget {
+
+  static final _sizeTween = Tween<double>(begin: 0, end: 300);
+
   AnimatedLogo({Key key, Animation<double> animation})
       : super(key: key, listenable: animation);
 
@@ -13,11 +16,14 @@ class AnimatedLogo extends AnimatedWidget {
     print('AnimatedWidget创建');
     final animation = listenable as Animation<double>;
     return Center(
-      child: Container(
-        child: FlutterLogo(),
-        margin: const EdgeInsets.symmetric(vertical: 10),
-        height: animation.value,
-        width: animation.value,
+      child: FadeTransition(
+        opacity: animation,
+        child: Container(
+          child: FlutterLogo(),
+          margin: const EdgeInsets.symmetric(vertical: 10),
+          height: _sizeTween.evaluate(animation),
+          width: _sizeTween.evaluate(animation),
+        ),
       ),
     );
   }
@@ -28,7 +34,7 @@ class LogoApp extends StatefulWidget {
   State<StatefulWidget> createState() => _LogoAppState();
 }
 
-class _LogoAppState extends State<LogoApp> with SingleTickerProviderStateMixin {
+class _LogoAppState extends State<LogoApp> with TickerProviderStateMixin {
   Animation<double> animation;
   AnimationController controller;
 
@@ -36,17 +42,9 @@ class _LogoAppState extends State<LogoApp> with SingleTickerProviderStateMixin {
   void initState() {
     super.initState();
     controller =
-        AnimationController(vsync: this, duration: const Duration(seconds: 2));
-    animation = Tween<double>(begin: 0, end: 300).animate(controller)
-      ..addStatusListener((status) {
-        print("$status");
-        if(status == AnimationStatus.completed) {
-          controller.reverse();
-        } else if(status == AnimationStatus.dismissed) {
-          controller.forward();
-        }
-      });
-    controller.forward();
+        AnimationController(vsync: this, duration: const Duration(seconds: 2))
+          ..repeat(reverse: true);
+    animation = CurvedAnimation(parent: controller, curve: Curves.easeIn);
   }
 
   @override
